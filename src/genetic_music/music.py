@@ -89,6 +89,7 @@ def fraction_silent(mus: Music) -> float:
     return silence / len(mus)
 
 def fraction_new_notes(mus: Music) -> float:
+    """Fraction of timestamps that are note-on."""
     new = 0
     for note in mus:
         if note >= 0:
@@ -96,6 +97,7 @@ def fraction_new_notes(mus: Music) -> float:
     return new / len(mus)
 
 def fraction_repeated_notes(mus: Music, dist:int=4) -> float:
+    """Fraction of notes-on that are the same pitch as a previous note-on."""
     recent_notes = {}
     queue = collections.deque()
     score = 0
@@ -114,6 +116,7 @@ def fraction_repeated_notes(mus: Music, dist:int=4) -> float:
     return score / num_notes if num_notes else 0
 
 def fraction_repeated_precisely(mus: Music, dist: int=4) -> float:
+    """Fraction of notes that are identical to that from a previous time."""
     if len(mus) <= dist:
         return 0
     score = 0
@@ -123,11 +126,13 @@ def fraction_repeated_precisely(mus: Music, dist: int=4) -> float:
     return score / (len(mus) - dist)
 
 def note_mean(mus: Music) -> float:
+    """Mean of note pitches."""
     filtered = [x for x in mus if x >= 0]
     return sum(filtered) / len(filtered) if filtered else 0
 
 # Would standard deviation be more useful?
 def note_variance(mus: Music) -> float:
+    """Variance of note pitches."""
     notes = [note for note in mus if note >= 0]
     if not notes:
         return 0
@@ -149,6 +154,7 @@ _default_intervals = {
     11: 0
 }
 def consecutive_intervals(mus: Music, intervals:dict[int, float]=_default_intervals) -> float:
+    """Score of intervals between consecutive notes. Resets on rest."""
     last_note = None
     changes = 0
     score = 0
@@ -175,6 +181,7 @@ def _syncopation_score(timestamp: int, modulus: int) -> float:
     return rev.bit_length()
 
 def syncopation(mus: Music, modulus:int=0) -> float:
+    """Score of syncopation. Higher score is more syncopated."""
     if modulus <= 0:
         modulus = len(mus)
     score = 0
@@ -187,6 +194,7 @@ def syncopation(mus: Music, modulus:int=0) -> float:
     return score / divisor if divisor > 0 else 0
 
 def fraction_in_scale(mus: Music, scale: set[int]) -> float:
+    """Fraction of notes that are in the provided scale modulo 12."""
     current_note = None
     score = 0
     notes = 0
@@ -220,10 +228,12 @@ def _note_lengths(mus: Music) -> list[int]:
     return lengths
 
 def length_mean(mus: Music) -> float:
+    """Mean length of held notes."""
     lengths = _note_lengths(mus)
     return sum(lengths) / len(lengths) if lengths else 0
 
 def length_variance(mus: Music) -> float:
+    """Variance in length of held notes."""
     lengths = _note_lengths(mus)
     if not lengths:
         return 0
