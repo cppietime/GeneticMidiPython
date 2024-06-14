@@ -120,10 +120,14 @@ def fraction_repeated_precisely(mus: Music, dist: int=4) -> float:
     if len(mus) <= dist:
         return 0
     score = 0
+    divisor = 0
     for i, note in enumerate(mus[:-dist]):
+        if note < 0:
+            continue
+        divisor += 1
         if note == mus[i + dist]:
             score += 1
-    return score / (len(mus) - dist)
+    return score / divisor if divisor else 0
 
 def note_mean(mus: Music) -> float:
     """Mean of note pitches."""
